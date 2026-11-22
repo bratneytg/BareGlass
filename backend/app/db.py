@@ -12,6 +12,7 @@ SCHEMA = [
         plan TEXT NOT NULL DEFAULT 'free',
         plan_until INTEGER NOT NULL DEFAULT 0,
         adult_confirmed_at INTEGER NOT NULL,
+        consent_at INTEGER NOT NULL,
         created_at INTEGER NOT NULL)""",
     """CREATE TABLE IF NOT EXISTS refresh_tokens(
         token_hash TEXT PRIMARY KEY,

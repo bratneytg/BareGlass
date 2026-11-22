@@ -38,7 +38,7 @@ class AuthActivity : Activity() {
         email.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
         pass = Ui.input(this, "Contraseña (mínimo 8 caracteres)", password = true)
         adult = CheckBox(this)
-        adult.text = "Soy mayor de edad y acepto los términos y la política de privacidad"
+        adult.text = "Soy mayor de edad, acepto los términos y la política de privacidad, y consiento que BareGlass guarde mis enlaces cifrados (pueden revelar datos sobre mi vida sexual). Puedo borrarlos cuando quiera."
         adult.setTextColor(Ui.MUT)
         adult.textSize = 13f
         adult.buttonTintList = ColorStateList.valueOf(Ui.ACC)

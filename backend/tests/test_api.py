@@ -27,7 +27,7 @@ def client(tmp_path, monkeypatch):
 
 
 def reg(c, email="a@b.com"):
-    r = c.post("/v1/auth/register", json={"email": email, "password": "supersecret1", "adult": True})
+    r = c.post("/v1/auth/register", json={"email": email, "password": "supersecret1", "adult": True, "consent": True})
     assert r.status_code == 200, r.text
     return r.json()
 
@@ -37,14 +37,19 @@ def H(tok):
 
 
 def test_register_requires_adult(client):
-    r = client.post("/v1/auth/register", json={"email": "a@b.com", "password": "supersecret1", "adult": False})
+    r = client.post("/v1/auth/register", json={"email": "a@b.com", "password": "supersecret1", "adult": False, "consent": True})
+    assert r.status_code == 400
+
+
+def test_register_requires_consent(client):
+    r = client.post("/v1/auth/register", json={"email": "a@b.com", "password": "supersecret1", "adult": True, "consent": False})
     assert r.status_code == 400
 
 
 def test_register_login_duplicate(client):
     t = reg(client)
     assert t["user"]["plan"] == "free"
-    assert client.post("/v1/auth/register", json={"email": "A@b.com", "password": "supersecret1", "adult": True}).status_code == 409
+    assert client.post("/v1/auth/register", json={"email": "A@b.com", "password": "supersecret1", "adult": True, "consent": True}).status_code == 409
     assert client.post("/v1/auth/login", json={"email": "a@b.com", "password": "mal"}).status_code == 401
     assert client.post("/v1/auth/login", json={"email": "a@b.com", "password": "supersecret1"}).status_code == 200
     assert client.get("/v1/me", headers=H(t)).json()["email"] == "a@b.com"

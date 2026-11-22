@@ -103,7 +103,7 @@ object Api {
 
     fun register(ctx: Context, email: String, password: String) {
         storeAuth(ctx, raw(ctx, "POST", "/v1/auth/register",
-            JSONObject().put("email", email).put("password", password).put("adult", true), null))
+            JSONObject().put("email", email).put("password", password).put("adult", true).put("consent", true), null))
     }
 
     fun login(ctx: Context, email: String, password: String) {

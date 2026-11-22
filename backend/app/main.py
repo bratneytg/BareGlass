@@ -36,6 +36,7 @@ class Register(BaseModel):
     email: str = Field(min_length=5, max_length=254)
     password: str = Field(min_length=8, max_length=200)
     adult: bool
+    consent: bool   # consentimiento explícito (RGPD art. 9): los enlaces guardados pueden revelar la vida sexual
 
 
 class Login(BaseModel):
@@ -106,6 +107,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(400, "Correo no válido")
         if not body.adult:
             raise HTTPException(400, "Debes confirmar que eres mayor de edad")
+        if not body.consent:
+            raise HTTPException(400, "Necesitamos tu consentimiento para guardar tus enlaces de forma cifrada")
         dek, wrapped = sec.new_user_key(cfg.master_key)
         uid = uuid.uuid4().hex
         pw = sec.hash_password(body.password)
@@ -114,8 +117,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             try:
                 try:
                     con.execute(
-                        "INSERT INTO users(id,email,pw_hash,dek_wrapped,adult_confirmed_at,created_at) VALUES(?,?,?,?,?,?)",
-                        (uid, email, pw, wrapped, now(), now()))
+                        "INSERT INTO users(id,email,pw_hash,dek_wrapped,adult_confirmed_at,consent_at,created_at) VALUES(?,?,?,?,?,?,?)",
+                        (uid, email, pw, wrapped, now(), now(), now()))
                 except Exception:
                     raise HTTPException(409, "Ese correo ya está registrado")
                 u = con.execute("SELECT * FROM users WHERE id=?", (uid,)).fetchone()
