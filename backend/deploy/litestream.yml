@@ -1,0 +1,10 @@
+dbs:
+  - path: /data/bareglass.db
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_BUCKET}
+        path: bareglass
+        endpoint: ${LITESTREAM_ENDPOINT}     # p. ej. https://s3.eu-central-003.backblazeb2.com
+        access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+        secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
+        retention: 168h                      # 7 días de historial

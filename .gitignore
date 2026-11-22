@@ -1,0 +1,11 @@
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+app/src/main/assets/depth_model.onnx
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/data/
+backend/.env
