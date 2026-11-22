@@ -40,6 +40,13 @@ class AgeGateActivity : Activity() {
             finish()
         }, Ui.lp(-1, -2, bottom = Ui.dp(this, 10)))
         col.addView(Ui.button(this, "Salir", false) { finishAffinity() }, Ui.lp(-1, -2))
+        if (BuildConfig.DEMO) {
+            val map = Ui.text(this, "🧭  Mapa de la app (demo)", 14f, Ui.GOLD, true)
+            map.gravity = Gravity.CENTER
+            map.setPadding(0, Ui.dp(this, 18), 0, Ui.dp(this, 8))
+            map.setOnClickListener { startActivity(Intent(this, StructureActivity::class.java)) }
+            col.addView(map, Ui.lp(-1, -2))
+        }
         setContentView(scroll)
     }
 }

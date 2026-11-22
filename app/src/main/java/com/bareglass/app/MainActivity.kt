@@ -91,6 +91,26 @@ class MainActivity : Activity() {
         promo = Screens.card(this)
         col.addView(promo, Ui.lp(-1, -2, bottom = Ui.dp(this, 8)))
 
+        if (BuildConfig.DEMO) {
+            col.addView(Ui.button(this, "▶  Probar con un video de ejemplo", false) {
+                urlField.setText(Demo.SAMPLE_VIDEO)
+                playTyped()
+            }, Ui.lp(-1, -2, bottom = Ui.dp(this, 12)))
+            val more = Screens.card(this)
+            more.addView(Ui.text(this, "Más", 15f, Ui.GOLD, true), Ui.lp(-1, -2, bottom = Ui.dp(this, 6)))
+            for ((k, label) in listOf("settings" to "⚙  Ajustes", "collections" to "📁  Colecciones ★", "profiles" to "🥽  Perfiles de gafas ★", "invite" to "🎁  Invitar amigos", "help" to "❓  Ayuda", "legal" to "⚖  Legal y privacidad")) {
+                val t = Ui.text(this, label, 15f, Ui.TXT)
+                t.setPadding(0, Ui.dp(this, 10), 0, Ui.dp(this, 10))
+                t.setOnClickListener { startActivity(Intent(this, MockupActivity::class.java).putExtra("key", k)) }
+                more.addView(t)
+            }
+            val map = Ui.text(this, "🧭  Mapa de la app (demo)", 15f, Ui.GOLD, true)
+            map.setPadding(0, Ui.dp(this, 10), 0, Ui.dp(this, 4))
+            map.setOnClickListener { startActivity(Intent(this, StructureActivity::class.java)) }
+            more.addView(map)
+            col.addView(more, Ui.lp(-1, -2, bottom = Ui.dp(this, 8)))
+        }
+
         col.addView(Ui.text(this, "Mis enlaces", 15f, Ui.GOLD, true), Ui.lp(-1, -2, top = Ui.dp(this, 14), bottom = Ui.dp(this, 8)))
         linksBox = LinearLayout(this)
         linksBox.orientation = LinearLayout.VERTICAL
@@ -158,7 +178,7 @@ class MainActivity : Activity() {
             promo.visibility = android.view.View.VISIBLE
             promo.addView(Ui.text(this, "✦ Hazte Premium", 16f, Ui.GOLD, true))
             promo.addView(Ui.text(this, "Hasta 5.000 enlaces guardados y sincronizados en todos tus dispositivos.", 13f, Ui.MUT), Ui.lp(-1, -2, top = Ui.dp(this, 4), bottom = Ui.dp(this, 10)))
-            promo.addView(Ui.button(this, "Ver Premium", true) { startActivity(Intent(this, AccountActivity::class.java)) })
+            promo.addView(Ui.button(this, "Ver Premium", true) { startActivity(Intent(this, PremiumActivity::class.java)) })
         } else {
             promo.visibility = android.view.View.VISIBLE
             promo.addView(Ui.text(this, "Crea tu cuenta gratis", 16f, Ui.GOLD, true))
@@ -211,7 +231,7 @@ class MainActivity : Activity() {
                 .setTitle("Límite de enlaces")
                 .setMessage(e.message)
                 .setPositiveButton(if (Session.loggedIn(this)) "Ver Premium" else "Crear cuenta") { _, _ ->
-                    startActivity(Intent(this, if (Session.loggedIn(this)) AccountActivity::class.java else AuthActivity::class.java))
+                    startActivity(Intent(this, if (Session.loggedIn(this)) PremiumActivity::class.java else AuthActivity::class.java))
                 }
                 .setNegativeButton("Ahora no", null)
                 .show()

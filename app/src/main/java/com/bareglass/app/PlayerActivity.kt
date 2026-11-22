@@ -32,6 +32,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 
 /** Visor: reproduce un archivo del móvil o un enlace de internet en VR (Cardboard), rojo/cian o 2D. */
@@ -133,7 +134,7 @@ class PlayerActivity : Activity() {
             .setAllowCrossProtocolRedirects(true)
         intent.getStringExtra("referer")?.let { http.setDefaultRequestProperties(mapOf("Referer" to it)) }
         player = ExoPlayer.Builder(this)
-            .setMediaSourceFactory(DefaultMediaSourceFactory(http))
+            .setMediaSourceFactory(DefaultMediaSourceFactory(DefaultDataSource.Factory(this, http)))
             .setAudioAttributes(AudioAttributes.DEFAULT, true)
             .setHandleAudioBecomingNoisy(true)
             .build()

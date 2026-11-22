@@ -12,10 +12,14 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "0.2.0-demo"
         // Dirección de la API: ./gradlew assembleDebug -PapiBase=https://api.tudominio.com
         val apiBase = (project.findProperty("apiBase") as String?) ?: ""
         buildConfigField("String", "API_BASE", "\"$apiBase\"")
+        // Modo demostración (sin servidor: cuentas de prueba, pago simulado, mapa de pantallas).
+        // Para quitarlo: -Pdemo=false  (o cambiar el valor por defecto de abajo a "false").
+        val demo = (project.findProperty("demo") as String?) ?: "true"
+        buildConfigField("boolean", "DEMO", demo)
     }
 
     buildFeatures {

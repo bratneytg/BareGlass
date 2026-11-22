@@ -25,9 +25,12 @@ class AccountActivity : Activity() {
         status = Ui.text(this, "", 13f, Ui.GOLD)
 
         if (Session.plan(this) != "premium") {
-            col.addView(Ui.button(this, "✦ Hazte Premium", true) { checkout() }, Ui.lp(-1, -2, bottom = Ui.dp(this, 10)))
+            col.addView(Ui.button(this, "✦ Hazte Premium", true) { startActivity(Intent(this, PremiumActivity::class.java)) }, Ui.lp(-1, -2, bottom = Ui.dp(this, 10)))
         } else {
-            col.addView(Ui.button(this, "Gestionar suscripción", false) { checkout() }, Ui.lp(-1, -2, bottom = Ui.dp(this, 10)))
+            col.addView(Ui.button(this, "Gestionar suscripción", false) { startActivity(Intent(this, PremiumActivity::class.java)) }, Ui.lp(-1, -2, bottom = Ui.dp(this, 10)))
+        }
+        for ((k, label) in listOf("devices" to "📱  Dispositivos y sesiones", "backup" to "💾  Copia de seguridad", "invite" to "🎁  Invitar amigos", "settings" to "⚙  Ajustes")) {
+            col.addView(Ui.button(this, label, false) { startActivity(Intent(this, MockupActivity::class.java).putExtra("key", k)) }, Ui.lp(-1, -2, bottom = Ui.dp(this, 10)))
         }
         col.addView(Ui.button(this, "Actualizar estado de mi plan", false) { refresh() }, Ui.lp(-1, -2, bottom = Ui.dp(this, 10)))
         col.addView(Ui.button(this, "Descargar mis datos", false) { export() }, Ui.lp(-1, -2, bottom = Ui.dp(this, 10)))

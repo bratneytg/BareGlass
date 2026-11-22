@@ -33,6 +33,16 @@ class AuthActivity : Activity() {
         title.typeface = android.graphics.Typeface.SERIF
         col.addView(title, Ui.lp(-2, -2, top = Ui.dp(this, 4), bottom = Ui.dp(this, 24)))
 
+        if (Demo.active(this)) {
+            val d = Screens.card(this)
+            d.addView(Ui.text(this, "🧪 Modo demostración", 14f, Ui.GOLD, true))
+            d.addView(Ui.text(this, "Cuentas de prueba (se guardan solo en este móvil):", 12f, Ui.MUT), Ui.lp(-1, -2, bottom = Ui.dp(this, 8)))
+            d.addView(Ui.button(this, "Usuario gratis · " + Demo.EMAIL, false) { fill(Demo.EMAIL) }, Ui.lp(-1, -2, bottom = Ui.dp(this, 8)))
+            d.addView(Ui.button(this, "Usuario Premium · " + Demo.EMAIL_PREMIUM, false) { fill(Demo.EMAIL_PREMIUM) }, Ui.lp(-1, -2, bottom = Ui.dp(this, 8)))
+            d.addView(Ui.text(this, "Contraseña de ambos: " + Demo.PASS, 12f, Ui.MUT))
+            col.addView(d, Ui.lp(-1, -2, bottom = Ui.dp(this, 14)))
+        }
+
         val card = Screens.card(this)
         email = Ui.input(this, "Correo electrónico")
         email.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -81,9 +91,25 @@ class AuthActivity : Activity() {
         adv.setOnClickListener { server.visibility = if (server.visibility == View.GONE) View.VISIBLE else View.GONE }
         col.addView(adv, Ui.lp(-1, -2))
         col.addView(server, Ui.lp(-1, -2))
+        if (BuildConfig.DEMO) {
+            val map = Ui.text(this, "🧭  Mapa de la app (demo)", 14f, Ui.GOLD, true)
+            map.gravity = Gravity.CENTER
+            map.setPadding(0, Ui.dp(this, 16), 0, Ui.dp(this, 8))
+            map.setOnClickListener { startActivity(Intent(this, StructureActivity::class.java)) }
+            col.addView(map, Ui.lp(-1, -2))
+        }
 
         render()
         setContentView(scroll)
+    }
+
+    private fun fill(e: String) {
+        register = false
+        render()
+        email.setText(e)
+        pass.setText(Demo.PASS)
+        status.setTextColor(Ui.MUT)
+        status.text = "Datos rellenados: pulsa «Entrar»"
     }
 
     private fun render() {

@@ -19,7 +19,7 @@ object Api {
         return if (o.isNotEmpty()) o else BuildConfig.API_BASE
     }
 
-    fun configured(ctx: Context): Boolean = base(ctx).isNotBlank()
+    fun configured(ctx: Context): Boolean = base(ctx).isNotBlank() || Demo.active(ctx)
 
     /** Ejecuta [work] en un hilo aparte y entrega el resultado en el hilo de la interfaz. */
     fun <T> async(work: () -> T, done: (Result<T>) -> Unit) {
@@ -102,11 +102,13 @@ object Api {
     }
 
     fun register(ctx: Context, email: String, password: String) {
+        if (Demo.active(ctx)) return Demo.register(ctx, email, password)
         storeAuth(ctx, raw(ctx, "POST", "/v1/auth/register",
             JSONObject().put("email", email).put("password", password).put("adult", true).put("consent", true), null))
     }
 
     fun login(ctx: Context, email: String, password: String) {
+        if (Demo.active(ctx)) return Demo.login(ctx, email, password)
         storeAuth(ctx, raw(ctx, "POST", "/v1/auth/login",
             JSONObject().put("email", email).put("password", password), null))
     }
@@ -114,7 +116,7 @@ object Api {
     fun logout(ctx: Context) {
         val rt = Session.refresh(ctx)
         try {
-            if (rt.isNotEmpty()) raw(ctx, "POST", "/v1/auth/logout", JSONObject().put("refresh", rt), null)
+            if (rt.isNotEmpty() && !Demo.active(ctx)) raw(ctx, "POST", "/v1/auth/logout", JSONObject().put("refresh", rt), null)
         } catch (e: Exception) {
             // sin conexión: se cierra la sesión igualmente en el móvil
         }
@@ -122,20 +124,23 @@ object Api {
     }
 
     fun me(ctx: Context) {
+        if (Demo.active(ctx)) return Demo.me(ctx)
         storeUser(ctx, JSONObject(authed(ctx, "GET", "/v1/me")))
     }
 
     fun deleteAccount(ctx: Context) {
+        if (Demo.active(ctx)) return Demo.deleteAccount(ctx)
         authed(ctx, "DELETE", "/v1/me")
         Session.clear(ctx)
     }
 
-    fun export(ctx: Context): String = authed(ctx, "GET", "/v1/me/export")
+    fun export(ctx: Context): String = if (Demo.active(ctx)) Demo.export(ctx) else authed(ctx, "GET", "/v1/me/export")
 
     fun checkoutUrl(ctx: Context): String =
         JSONObject(authed(ctx, "POST", "/v1/billing/checkout")).getString("url")
 
     fun links(ctx: Context): List<SavedLink> {
+        if (Demo.active(ctx)) return Demo.links(ctx)
         val arr = JSONArray(authed(ctx, "GET", "/v1/links"))
         return (0 until arr.length()).map {
             val o = arr.getJSONObject(it)
@@ -144,11 +149,13 @@ object Api {
     }
 
     fun addLink(ctx: Context, url: String, title: String): SavedLink {
+        if (Demo.active(ctx)) return Demo.addLink(ctx, url, title)
         val o = JSONObject(authed(ctx, "POST", "/v1/links", JSONObject().put("url", url).put("title", title)))
         return SavedLink(o.getString("id"), o.getString("url"), o.optString("title", ""))
     }
 
     fun deleteLink(ctx: Context, id: String) {
+        if (Demo.active(ctx)) return Demo.deleteLink(ctx, id)
         authed(ctx, "DELETE", "/v1/links/$id")
     }
 }

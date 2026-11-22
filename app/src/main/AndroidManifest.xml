@@ -41,5 +41,8 @@
                 <data android:mimeType="video/*" />
             </intent-filter>
         </activity>
+        <activity android:name=".PremiumActivity" android:exported="false" />
+        <activity android:name=".MockupActivity" android:exported="false" />
+        <activity android:name=".StructureActivity" android:exported="false" />
     </application>
 </manifest>
