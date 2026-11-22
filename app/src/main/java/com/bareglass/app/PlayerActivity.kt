@@ -61,6 +61,7 @@ class PlayerActivity : Activity() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var uriString = ""
+    private var triedHls = false
     private var name = "video"
     private var vw = 0
     private var vh = 0
@@ -160,6 +161,17 @@ class PlayerActivity : Activity() {
             }
 
             override fun onPlayerError(error: PlaybackException) {
+                val container = error.errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED ||
+                    error.errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED
+                if (container && !triedHls && uriString.startsWith("http")) {
+                    // Algunos enlaces acaban en .mp4 pero en realidad son listas HLS: reintentamos como HLS.
+                    triedHls = true
+                    val retry = MediaItem.Builder().setUri(uri).setMimeType(MimeTypes.APPLICATION_M3U8).build()
+                    player.setMediaItem(retry)
+                    player.prepare()
+                    player.playWhenReady = true
+                    return
+                }
                 showOverlay(true)
                 showError(error)
             }
@@ -205,6 +217,7 @@ class PlayerActivity : Activity() {
         val detail = "Código: " + e.errorCodeName + " (" + e.errorCode + ")\n" +
             "Detalle: " + (root?.javaClass?.simpleName ?: "-") + ": " + (root?.message ?: e.message ?: "-") + "\n" +
             "Enlace: " + uriString.take(300) + "\n" +
+            "Modo: " + (if (intent.getBooleanExtra("hls", false)) "HLS" else "directo") + (if (triedHls) " (reintentado como HLS)" else "") + "\n" +
             "Móvil: " + Build.MANUFACTURER + " " + Build.MODEL + " · Android " + Build.VERSION.RELEASE + " · BareGlass " + BuildConfig.VERSION_NAME
         if (isFinishing) return
         if (uriString.startsWith("http") && !errorProbing) {

@@ -104,10 +104,37 @@ object LinkResolver {
         }
     }
 
+    /** Mira los primeros bytes con una petición parcial (como hace el reproductor). null si no responde bien. */
+    private fun peek(url: String, referer: String?): Kind? {
+        return try {
+            val c = URL(url).openConnection() as HttpURLConnection
+            c.instanceFollowRedirects = true
+            c.connectTimeout = 10_000
+            c.readTimeout = 10_000
+            c.setRequestProperty("User-Agent", UA)
+            c.setRequestProperty("Range", "bytes=0-2047")
+            if (referer != null) c.setRequestProperty("Referer", referer)
+            try {
+                if (c.responseCode !in 200..299) return null
+                val head = readUpTo(c, 2048)
+                sniff(c.contentType, String(head, Charsets.UTF_8))
+            } finally {
+                c.disconnect()
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     /** Bloqueante. Devuelve los videos encontrados (uno si el enlace es directo, varios si es una página). */
     fun resolve(input: String): List<Playable> {
         val url = normalize(input)
         val direct = looksDirect(url)
+        when (peek(url, null)) {
+            Kind.HLS -> return listOf(Playable(url, true, null, labelFor(url)))
+            Kind.MEDIA -> return listOf(Playable(url, false, null, labelFor(url)))
+            else -> {}
+        }
         val c = try {
             open(url, null)
         } catch (e: Exception) {

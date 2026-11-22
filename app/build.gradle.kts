@@ -12,7 +12,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "0.2.0-demo"
+        versionName = "0.2.2-demo"
         // Dirección de la API: ./gradlew assembleDebug -PapiBase=https://api.tudominio.com
         val apiBase = (project.findProperty("apiBase") as String?) ?: ""
         buildConfigField("String", "API_BASE", "\"$apiBase\"")
