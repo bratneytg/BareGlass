@@ -4,7 +4,7 @@ Visor de video en realidad virtual para adultos (Android + gafas Cardboard). Peg
 
 * **Aplicación Android** (`app/`): aviso +18, registro/inicio de sesión (o uso sin cuenta), pegar enlace (directo `.mp4/.webm/.m3u8` o página con video), abrir archivos del móvil, VR con seguimiento de cabeza y menú con la mirada, pantalla curva/plana, zoom, altura y separación estéreo, enlaces guardados, cuenta y Premium.
 * **API** (`backend/`): FastAPI + SQLite (WAL) + Litestream. Cifrado por usuario. Despliegue en un VPS pequeño con `backend/deploy/`.
-* **Documentos** (`docs/`): [arquitectura de datos](docs/arquitectura-datos.md) · [marketing](docs/marketing.md) · [ingresos](docs/ingresos.md) · [legal y distribución](docs/legal-y-distribucion.md).
+* **Documentos** (`docs/`): índice en [docs/README.md](docs/README.md): [pagos](docs/01-pagos.md) · [suscripciones](docs/02-suscripciones-y-modalidades.md) · [marketing](docs/03-marketing-y-publicidad.md) · [base de datos](docs/04-base-de-datos-usuarios.md) · [verificación de edad](docs/05-verificacion-de-edad.md) · [ingresos](docs/06-ingresos-y-escenarios.md) · [legal](docs/07-legal-y-distribucion.md).
 
 ## Compilar la app
 
@@ -33,4 +33,4 @@ docker compose up -d --build
 ```
 
 ## Estado
-Versión inicial 0.1: la parte de pagos está preparada pero necesita una cuenta de un procesador de pagos para adultos; la verificación de edad es por declaración (ver `docs/legal-y-distribucion.md` antes de promocionar).
+Versión inicial 0.1: la parte de pagos está preparada pero necesita una cuenta de un procesador de pagos para adultos; la verificación de edad es por declaración (ver `docs/07-legal-y-distribucion.md` antes de promocionar).
