@@ -80,6 +80,30 @@ object LinkResolver {
         return out.toByteArray()
     }
 
+    /** Para el informe de errores: qué responde el servidor realmente (estado, tipo y primeros bytes). Bloqueante. */
+    fun probe(url: String, referer: String?): String {
+        return try {
+            val c = URL(url).openConnection() as HttpURLConnection
+            c.instanceFollowRedirects = true
+            c.connectTimeout = 8_000
+            c.readTimeout = 8_000
+            c.setRequestProperty("User-Agent", UA)
+            c.setRequestProperty("Range", "bytes=0-255")
+            if (referer != null) c.setRequestProperty("Referer", referer)
+            val code = c.responseCode
+            val type = c.contentType ?: "-"
+            val stream = if (code in 200..299) c.inputStream else c.errorStream
+            val buf = ByteArray(256)
+            val n = if (stream != null) maxOf(0, stream.read(buf)) else 0
+            c.disconnect()
+            val txt = String(buf, 0, n, Charsets.ISO_8859_1).map { if (it.code in 32..126) it else '.' }.joinToString("")
+            val hex = buf.take(minOf(n, 16)).joinToString(" ") { "%02x".format(it) }
+            "Respuesta: HTTP $code · $type · ${n} bytes\nInicio (texto): ${txt.take(120)}\nInicio (hex): $hex"
+        } catch (e: Exception) {
+            "Respuesta: sin conexión (" + (e.message ?: e.javaClass.simpleName) + ")"
+        }
+    }
+
     /** Bloqueante. Devuelve los videos encontrados (uno si el enlace es directo, varios si es una página). */
     fun resolve(input: String): List<Playable> {
         val url = normalize(input)

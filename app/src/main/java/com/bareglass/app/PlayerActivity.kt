@@ -207,6 +207,24 @@ class PlayerActivity : Activity() {
             "Enlace: " + uriString.take(300) + "\n" +
             "Móvil: " + Build.MANUFACTURER + " " + Build.MODEL + " · Android " + Build.VERSION.RELEASE + " · BareGlass " + BuildConfig.VERSION_NAME
         if (isFinishing) return
+        if (uriString.startsWith("http") && !errorProbing) {
+            errorProbing = true
+            Toast.makeText(this, "Analizando el enlace…", Toast.LENGTH_SHORT).show()
+            val u = uriString
+            val ref = intent.getStringExtra("referer")
+            Api.async({ LinkResolver.probe(u, ref) }) { r ->
+                errorProbing = false
+                showErrorDialog(e, detail + "\n" + r.getOrDefault("Respuesta: no disponible"))
+            }
+        } else {
+            showErrorDialog(e, detail)
+        }
+    }
+
+    private var errorProbing = false
+
+    private fun showErrorDialog(e: PlaybackException, detail: String) {
+        if (isFinishing) return
         AlertDialog.Builder(this)
             .setTitle("No se pudo reproducir")
             .setMessage(errorHint(e) + "\n\n" + detail)
