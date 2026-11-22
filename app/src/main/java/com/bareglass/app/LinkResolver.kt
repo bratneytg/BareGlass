@@ -55,28 +55,62 @@ object LinkResolver {
         throw IllegalStateException("Demasiadas redirecciones")
     }
 
+    enum class Kind { HLS, HTML, MEDIA, UNKNOWN }
+
+    /** Decide qué es lo que devolvió el servidor mirando el tipo y los primeros bytes (la extensión del enlace puede mentir). */
+    fun sniff(contentType: String?, head: String): Kind {
+        val type = (contentType ?: "").lowercase()
+        val h = head.trimStart('\uFEFF', ' ', '\n', '\r', '\t')
+        if (h.startsWith("#EXTM3U") || type.contains("mpegurl")) return Kind.HLS
+        if (type.contains("html") || h.startsWith("<!doctype html", ignoreCase = true) || h.startsWith("<html", ignoreCase = true)) return Kind.HTML
+        if (type.startsWith("video/") || type.startsWith("audio/") || type.contains("matroska") || type.contains("mp4")) return Kind.MEDIA
+        if (type.contains("octet-stream") || type.isEmpty()) return Kind.MEDIA
+        return Kind.UNKNOWN
+    }
+
+    private fun readUpTo(c: HttpURLConnection, limit: Int): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(32 * 1024)
+        val ins = c.inputStream
+        while (out.size() < limit) {
+            val n = ins.read(buf, 0, minOf(buf.size, limit - out.size()))
+            if (n < 0) break
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
+    }
+
     /** Bloqueante. Devuelve los videos encontrados (uno si el enlace es directo, varios si es una página). */
     fun resolve(input: String): List<Playable> {
         val url = normalize(input)
-        if (looksDirect(url)) return listOf(Playable(url, isHls(url), null, labelFor(url)))
-        val c = open(url, null)
+        val direct = looksDirect(url)
+        val c = try {
+            open(url, null)
+        } catch (e: Exception) {
+            // Algunos servidores rechazan esta comprobación pero sirven bien al reproductor.
+            if (direct) return listOf(Playable(url, isHls(url), null, labelFor(url)))
+            throw e
+        }
         try {
-            val type = (c.contentType ?: "").lowercase()
-            if (type.contains("mpegurl")) return listOf(Playable(url, true, null, labelFor(url)))
-            if (type.startsWith("video/")) return listOf(Playable(url, false, null, labelFor(url)))
-            if (!type.contains("html")) {
-                throw IllegalArgumentException("Ese enlace no parece un video ni una página con video.")
-            }
-            val out = java.io.ByteArrayOutputStream()
-            val buf = ByteArray(32 * 1024)
-            c.inputStream.use { ins ->
-                while (out.size() < 4_000_000) {
-                    val n = ins.read(buf, 0, minOf(buf.size, 4_000_000 - out.size()))
-                    if (n < 0) break
-                    out.write(buf, 0, n)
+            val type = c.contentType
+            val kind = sniff(type, String(readUpTo(c, 2048), Charsets.UTF_8))
+            when (kind) {
+                Kind.HLS -> return listOf(Playable(url, true, null, labelFor(url)))
+                Kind.MEDIA -> return listOf(Playable(url, false, null, labelFor(url)))
+                Kind.UNKNOWN -> {
+                    if (direct) return listOf(Playable(url, isHls(url), null, labelFor(url)))
+                    throw IllegalArgumentException("Ese enlace no parece un video ni una página con video.")
                 }
+                Kind.HTML -> {}
             }
-            val found = PageScan.findVideoLinks(url, String(out.toByteArray(), Charsets.UTF_8))
+        } finally {
+            c.disconnect()
+        }
+        // Es una página: la descargamos de nuevo completa y buscamos los videos dentro.
+        val c2 = open(url, null)
+        try {
+            val html = String(readUpTo(c2, 4_000_000), Charsets.UTF_8)
+            val found = PageScan.findVideoLinks(url, html)
             if (found.isEmpty()) {
                 throw IllegalArgumentException(
                     "No encontré ningún video en esa página. Puede que el reproductor lo cargue con scripts o protegido; " +
@@ -85,7 +119,7 @@ object LinkResolver {
             }
             return found.map { Playable(it, isHls(it), url, labelFor(it)) }
         } finally {
-            c.disconnect()
+            c2.disconnect()
         }
     }
 }

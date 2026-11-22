@@ -49,7 +49,7 @@ class MainActivity : Activity() {
         val brandCol = LinearLayout(this)
         brandCol.orientation = LinearLayout.VERTICAL
         brandCol.addView(Ui.brand(this, 28f))
-        brandCol.addView(Ui.text(this, "Mira sin filtros.", 12f, Ui.GOLD).also { it.typeface = android.graphics.Typeface.SERIF })
+        brandCol.addView(Ui.text(this, "Tu cine en realidad virtual.", 12f, Ui.GOLD).also { it.typeface = android.graphics.Typeface.SERIF })
         header.addView(brandCol, LinearLayout.LayoutParams(0, -2, 1f))
         chip = Ui.text(this, "", 13f, Ui.TXT, true)
         chip.gravity = Gravity.CENTER
@@ -125,13 +125,8 @@ class MainActivity : Activity() {
         setContentView(scroll)
     }
 
-    /** Aviso +18 y cuenta/invitado antes de entrar. Devuelve false si se ha redirigido a otra pantalla. */
+    /** Cuenta o invitado antes de entrar. Devuelve false si se ha redirigido a otra pantalla. */
     private fun gate(): Boolean {
-        if (!Session.adultConfirmed(this)) {
-            startActivity(Intent(this, AgeGateActivity::class.java))
-            finish()
-            return false
-        }
         if (!Session.loggedIn(this) && !Session.guest(this)) {
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
@@ -142,7 +137,7 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        if (!Session.adultConfirmed(this) || (!Session.loggedIn(this) && !Session.guest(this))) {
+        if (!Session.loggedIn(this) && !Session.guest(this)) {
             gate()
             return
         }

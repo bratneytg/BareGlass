@@ -85,10 +85,6 @@ class MockupActivity : Activity() {
                 }
             }
         }
-        if (key == "age") {
-            val ok = getSharedPreferences("bg_app", Context.MODE_PRIVATE).getBoolean("ageVerified", false)
-            col.addView(Ui.text(this, if (ok) "Estado: ✔ verificado (simulado)" else "Estado: sin verificar", 14f, if (ok) Ui.GOLD else Ui.MUT, true), Ui.lp(-1, -2, top = Ui.dp(this, 10)))
-        }
         setContentView(scroll)
     }
 
@@ -113,11 +109,6 @@ class MockupActivity : Activity() {
             a.startsWith("legal:") -> {
                 val t = Mockups.texts[a.removePrefix("legal:")] ?: "(sin texto)"
                 AlertDialog.Builder(this).setTitle(it.title).setMessage(t).setPositiveButton("Cerrar", null).show()
-            }
-            a == "age_ok" -> {
-                getSharedPreferences("bg_app", Context.MODE_PRIVATE).edit().putBoolean("ageVerified", true).apply()
-                Toast.makeText(this, "Verificación simulada ✔", Toast.LENGTH_SHORT).show()
-                recreate()
             }
             a == "report" -> Toast.makeText(this, "Denuncia simulada enviada. Gracias.", Toast.LENGTH_LONG).show()
             a == "redeem" -> {

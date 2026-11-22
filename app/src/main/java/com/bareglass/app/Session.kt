@@ -21,8 +21,6 @@ object Session {
 
     private fun app(ctx: Context): SharedPreferences = ctx.getSharedPreferences("bg_app", Context.MODE_PRIVATE)
 
-    fun adultConfirmed(ctx: Context): Boolean = app(ctx).getBoolean("adult", false)
-    fun confirmAdult(ctx: Context) = app(ctx).edit().putBoolean("adult", true).apply()
 
     /** El usuario eligió usar la app sin cuenta. */
     fun guest(ctx: Context): Boolean = app(ctx).getBoolean("guest", false)

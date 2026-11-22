@@ -35,8 +35,8 @@ class RateLimiter:
 class Register(BaseModel):
     email: str = Field(min_length=5, max_length=254)
     password: str = Field(min_length=8, max_length=200)
-    adult: bool
-    consent: bool   # consentimiento explícito (RGPD art. 9): los enlaces guardados pueden revelar la vida sexual
+    adult: bool = True   # obsoleto: la app ya no lo pide (se mantiene por compatibilidad)
+    consent: bool   # consentimiento explícito a guardar los enlaces cifrados (pueden revelar datos personales sensibles, RGPD art. 9)
 
 
 class Login(BaseModel):
@@ -105,8 +105,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         email = body.email.strip().lower()
         if "@" not in email or " " in email or len(email.split("@")[-1]) < 3:
             raise HTTPException(400, "Correo no válido")
-        if not body.adult:
-            raise HTTPException(400, "Debes confirmar que eres mayor de edad")
         if not body.consent:
             raise HTTPException(400, "Necesitamos tu consentimiento para guardar tus enlaces de forma cifrada")
         dek, wrapped = sec.new_user_key(cfg.master_key)

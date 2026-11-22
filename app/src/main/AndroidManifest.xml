@@ -24,7 +24,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AgeGateActivity" android:exported="false" />
         <activity android:name=".AuthActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".AccountActivity" android:exported="false" />
 

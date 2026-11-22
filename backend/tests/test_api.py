@@ -36,9 +36,9 @@ def H(tok):
     return {"Authorization": "Bearer " + tok["access"]}
 
 
-def test_register_requires_adult(client):
-    r = client.post("/v1/auth/register", json={"email": "a@b.com", "password": "supersecret1", "adult": False, "consent": True})
-    assert r.status_code == 400
+def test_register_without_adult_flag(client):
+    r = client.post("/v1/auth/register", json={"email": "a@b.com", "password": "supersecret1", "consent": True})
+    assert r.status_code == 200
 
 
 def test_register_requires_consent(client):

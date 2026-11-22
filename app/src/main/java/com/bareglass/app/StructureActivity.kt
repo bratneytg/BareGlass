@@ -47,7 +47,6 @@ class StructureActivity : Activity() {
         col.addView(who, Ui.lp(-1, -2, bottom = Ui.dp(this, 14)))
 
         section("Entrada")
-        row("✅", "Aviso +18", "Primera pantalla al instalar") { startActivity(Intent(this, AgeGateActivity::class.java)) }
         row("✅", "Entrar / crear cuenta", "Con cuentas de prueba locales") { startActivity(Intent(this, AuthActivity::class.java)) }
         row("✅", "Inicio", "Pegar enlace, guardar, abrir archivo") { startActivity(Intent(this, MainActivity::class.java)) }
 
@@ -75,7 +74,6 @@ class StructureActivity : Activity() {
         section("Seguridad y legal")
         mock("🧪", "settings")
         mock("🧪", "pin")
-        mock("🧪", "age")
         mock("🧪", "legal")
         mock("🧪", "report")
 
@@ -93,12 +91,12 @@ class StructureActivity : Activity() {
                 build()
             }
         }
-        row("♻", "Reiniciar la demo", "Borra usuarios, enlaces y vuelve al aviso +18") {
+        row("♻", "Reiniciar la demo", "Borra usuarios, enlaces y vuelve a la pantalla de entrada") {
             AlertDialog.Builder(this)
                 .setMessage("Se borrarán los datos de prueba y la app volverá al principio.")
                 .setPositiveButton("Reiniciar") { _, _ ->
                     Demo.reset(this)
-                    val i = Intent(this, AgeGateActivity::class.java)
+                    val i = Intent(this, AuthActivity::class.java)
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     startActivity(i)
                 }

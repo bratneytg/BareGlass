@@ -35,12 +35,6 @@ object Mockups {
             MockItem(MK.BUTTON, "Cambiar PIN"),
             MockItem(MK.TEXT, "Cuando exista, el PIN se guardará solo en este móvil.")
         )),
-        "age" to MockScreen("✅", "Verificación de edad", "Comprobar que eres mayor de edad con un método reconocido. Aquí se simula el resultado.", false, listOf(
-            MockItem(MK.ROW, "Estimación facial (selfie)", "Rápida, no guarda tu foto.", "age_ok"),
-            MockItem(MK.ROW, "Documento de identidad", "Más fiable; lo gestiona el proveedor.", "age_ok"),
-            MockItem(MK.ROW, "App europea de verificación de edad", "Prueba que eres mayor de 18 sin revelar quién eres.", "age_ok"),
-            MockItem(MK.TEXT, "En la versión real se abrirá el proveedor elegido y BareGlass solo recibirá «mayor de 18: sí/no».")
-        )),
         "legal" to MockScreen("⚖", "Legal y privacidad", "Textos legales y canal de denuncias (borradores).", false, listOf(
             MockItem(MK.ROW, "Términos de uso", "", "legal:terms"),
             MockItem(MK.ROW, "Política de privacidad", "", "legal:privacy"),
@@ -48,11 +42,11 @@ object Mockups {
             MockItem(MK.ROW, "Denunciar contenido", "", "open:report"),
             MockItem(MK.ROW, "Contacto", "", "legal:contact")
         )),
-        "report" to MockScreen("🚩", "Denunciar contenido", "Avisa de un enlace con contenido ilegal o sin consentimiento. Se revisa de inmediato.", false, listOf(
+        "report" to MockScreen("🚩", "Denunciar contenido", "Avisa de un enlace con contenido ilegal o que infringe derechos. Se revisa cuanto antes.", false, listOf(
             MockItem(MK.INPUT, "Enlace o descripción"),
-            MockItem(MK.ROW, "Contenido con menores", "Tolerancia cero: se reporta a las autoridades.", "report"),
-            MockItem(MK.ROW, "Sin consentimiento de las personas", "", "report"),
-            MockItem(MK.ROW, "Otro motivo ilegal", "", "report")
+            MockItem(MK.ROW, "Contenido ilegal", "Se revisa y, si procede, se comunica a las autoridades.", "report"),
+            MockItem(MK.ROW, "Infracción de derechos de autor", "", "report"),
+            MockItem(MK.ROW, "Otro motivo", "", "report")
         )),
         "invite" to MockScreen("🎁", "Invitar amigos", "Cada amigo que se registre con tu código os da +10 enlaces guardables a los dos.", false, listOf(
             MockItem(MK.TEXT, "Tu código: BARE-7QX2"),
@@ -90,14 +84,14 @@ object Mockups {
             MockItem(MK.ROW, "Formatos 3D", "Lado a lado (SBS), arriba-abajo (TB) o 2D: elige el formato antes de pulsar «Ver en VR»."),
             MockItem(MK.ROW, "Un enlace no funciona", "Prueba con el enlace directo del archivo (.mp4, .webm, .m3u8) o genera un informe de errores.")
         )),
-        "about" to MockScreen("ℹ", "Acerca de BareGlass", "Visor de video en realidad virtual.", false, listOf(
+        "about" to MockScreen("ℹ", "Acerca de BareGlass", "Tu cine en realidad virtual.", false, listOf(
             MockItem(MK.TEXT, "Versión ${BuildConfig.VERSION_NAME}"),
             MockItem(MK.TEXT, "Reproducción con Media3 ExoPlayer. Los enlaces guardados se cifran con una clave propia de cada usuario.")
         ))
     )
 
     val texts: Map<String, String> = mapOf(
-        "terms" to "BORRADOR — Términos de uso\n\n1. BareGlass es un visor: no aloja ni vende videos.\n2. Debes ser mayor de edad.\n3. Está prohibido enlazar o reproducir contenido ilegal, con menores o sin consentimiento.\n4. Podemos cerrar cuentas que incumplan estas normas.\n\n(Texto provisional: debe revisarlo un abogado.)",
+        "terms" to "BORRADOR — Términos de uso\n\n1. BareGlass es un visor: no aloja ni vende videos.\n2. Debes tener la edad mínima legal para usar el servicio en tu país.\n3. Está prohibido enlazar o reproducir contenido ilegal o sin autorización.\n4. Podemos cerrar cuentas que incumplan estas normas.\n\n(Texto provisional: debe revisarlo un abogado.)",
         "privacy" to "BORRADOR — Política de privacidad\n\nGuardamos tu correo, tu plan y, si lo decides, tus enlaces cifrados. No guardamos videos ni historial de reproducción. Puedes exportar y borrar tus datos desde la app.\n\n(Texto provisional: debe revisarlo un abogado.)",
         "impressum" to "BORRADOR — Aviso legal (Impressum)\n\nNombre / empresa, dirección, correo de contacto y datos de registro.\n\n(Pendiente de rellenar con tus datos.)",
         "contact" to "Contacto: soporte@bareglass.test (ejemplo)"

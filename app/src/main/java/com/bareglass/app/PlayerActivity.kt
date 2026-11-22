@@ -1,6 +1,8 @@
 package com.bareglass.app
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.net.Uri
@@ -158,8 +160,8 @@ class PlayerActivity : Activity() {
             }
 
             override fun onPlayerError(error: PlaybackException) {
-                Toast.makeText(this@PlayerActivity, "No se pudo reproducir: " + error.errorCodeName, Toast.LENGTH_LONG).show()
                 showOverlay(true)
+                showError(error)
             }
         })
 
@@ -177,6 +179,45 @@ class PlayerActivity : Activity() {
         if (renderer.viewMode == StereoRenderer.MODE_VR && !ht.available) {
             Toast.makeText(this, "Tu móvil no tiene giroscopio: el modo VR no podrá seguir tu cabeza.", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun errorHint(e: PlaybackException): String = when (e.errorCode) {
+        PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED,
+        PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED ->
+            "El enlace no devuelve un video que el reproductor entienda (a veces es una página, una lista .m3u8 o un video protegido). Prueba con el enlace directo del archivo (.mp4, .webm, .m3u8)."
+        PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED,
+        PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED ->
+            "La lista de reproducción (.m3u8 / .mpd) no se pudo leer. Puede estar protegida o caducada."
+        PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS ->
+            "El servidor rechazó la petición (enlace caducado, protegido o que exige iniciar sesión)."
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT ->
+            "No se pudo conectar. Revisa tu internet y que el enlace siga activo."
+        PlaybackException.ERROR_CODE_DECODING_FAILED,
+        PlaybackException.ERROR_CODE_DECODER_INIT_FAILED ->
+            "Tu móvil no puede decodificar este video (formato o resolución demasiado exigentes)."
+        else -> "Prueba con otro enlace o con el archivo guardado en tu móvil."
+    }
+
+    private fun showError(e: PlaybackException) {
+        var root: Throwable? = e.cause
+        while (root?.cause != null) root = root.cause
+        val detail = "Código: " + e.errorCodeName + " (" + e.errorCode + ")\n" +
+            "Detalle: " + (root?.javaClass?.simpleName ?: "-") + ": " + (root?.message ?: e.message ?: "-") + "\n" +
+            "Enlace: " + uriString.take(300) + "\n" +
+            "Móvil: " + Build.MANUFACTURER + " " + Build.MODEL + " · Android " + Build.VERSION.RELEASE + " · BareGlass " + BuildConfig.VERSION_NAME
+        if (isFinishing) return
+        AlertDialog.Builder(this)
+            .setTitle("No se pudo reproducir")
+            .setMessage(errorHint(e) + "\n\n" + detail)
+            .setPositiveButton("Cerrar", null)
+            .setNeutralButton("Compartir informe") { _, _ ->
+                val i = Intent(Intent.ACTION_SEND)
+                i.type = "text/plain"
+                i.putExtra(Intent.EXTRA_TEXT, "=== Informe BareGlass ===\n" + detail)
+                startActivity(Intent.createChooser(i, "Enviar informe"))
+            }
+            .show()
     }
 
     /** Un control del panel VR se activó mirándolo fijamente. */
